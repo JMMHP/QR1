@@ -34,14 +34,18 @@ function decodeAndShowQRData() {
    const reader = new FileReader();
    reader.onload = function() {
        const qr = new QRCode();
-       qr.decode(reader.result);
        qr.callback = function(err, result) {
-           if (err) {
-               alert("Error decoding QR Code.");
+           if(err) {
+               alert("Error decoding QR Code: " + err);
            } else {
-               document.getElementById('decodedQRData').innerText = "Decoded QR Data: " + result.data;
+               if(result.data) {
+                   document.getElementById('decodedQRData').innerText = "Decoded QR Data: " + result.data;
+               } else {
+                   alert("No label data found in the QR Code.");
+               }
            }
        };
+       qr.decode(reader.result);
    };
    reader.readAsDataURL(fileInput.files[0]);
 }
