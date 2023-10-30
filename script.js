@@ -1,4 +1,3 @@
-[3:29 PM] Jordan Moeller
 function addField() {
 
     let container = document.getElementById('inputFields');
