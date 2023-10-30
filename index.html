@@ -19,21 +19,21 @@
 <input type="text" placeholder="Field Value" class="field-value">
 </div>
 </div>
-<button id="addFieldButton">Add Another Field</button>
-<button id="generateQRCodeButton">Generate QR Code</button>
+<button onclick="addField()">Add Another Field</button>
+<button onclick="generateQRCode()">Generate QR Code</button>
 <div id="qrcode"></div>
 <a id="downloadLink" href="#" download="qrcode.png" style="display:none;">Download QR Code</a>
 <!-- Excel Upload and Append Section -->
 <br><br>
 <h3>Excel Functionality</h3>
 <label>Upload QR Code:</label>
-<input type="file" id="qrInput">
+<input type="file" id="qrInput" onchange="decodeAndShowQRData()">
 <br>
 <label>Upload Excel File:</label>
 <input type="file" id="excelInput">
 <br>
-<button id="appendDataToExcelButton">Append Data to Excel</button>
-<span id="statusMessage"></span>
+<button onclick="appendDataToExcel()">Append Data to Excel</button>
+<div id="decodedQRData"></div> <!-- For displaying decoded QR data -->
 <a id="downloadLinkExcel" href="#" download="updated_excel.xlsx" style="display:none;">Download Updated Excel</a>
 <script src="script.js"></script>
 </body>
