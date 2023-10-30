@@ -49,27 +49,69 @@ function decodeAndShowQRData() {
    };
    reader.readAsDataURL(fileInput.files[0]);
 }
+[3:08 PM] Jordan Moeller
 function appendDataToExcel() {
-   const decodedData = document.getElementById('decodedQRData').innerText.replace("Decoded QR Data: ", "");
-   const excelFile = document.getElementById('excelInput').files[0];
-   const excelReader = new FileReader();
-   excelReader.onload = (e) => {
-       const workbook = XLSX.read(e.target.result, { type: 'binary' });
-       const ws = workbook.Sheets[workbook.SheetNames[0]];
-       const qrDataParts = decodedData.split(',');
-       let newRow = {};
-       for(let i = 0; i < qrDataParts.length; i += 2) {
-           if(qrDataParts[i] && qrDataParts[i+1]) {
-               newRow[qrDataParts[i].trim()] = qrDataParts[i+1].trim();
-           }
-       }
-       XLSX.utils.sheet_add_json(ws, [newRow], {skipHeader: true, origin: -1});
-       const updatedExcel = XLSX.write(workbook, { bookType: 'xlsx', bookSST: true, type: 'binary' });
-       const blob = new Blob([updatedExcel], { type: 'application/octet-stream' });
-       const link = document.getElementById('downloadLinkExcel');
-       link.href = URL.createObjectURL(blob);
-       link.download = 'updated_excel.xlsx';
-       link.style.display = 'block';
-   };
-   excelReader.readAsBinaryString(excelFile);
+
+    const decodedData = document.getElementById('decodedQRData').innerText.replace("Decoded QR Data: ", "");
+
+    const excelFile = document.getElementById('excelInput').files[0];
+
+    const excelReader = new FileReader();
+
+    excelReader.onload = (e) => {
+
+        const workbook = XLSX.read(e.target.result, { type: 'binary' });
+
+        const wsName = workbook.SheetNames[0];
+
+        const ws = workbook.Sheets[wsName];
+
+        // Assuming the decoded data is comma-separated as "header,data,header,data,..."
+
+        const dataArray = decodedData.split(',');
+
+        for(let i = 0; i < dataArray.length; i+=2) {
+
+            const col = XLSX.utils.encode_col(i/2);
+
+            const headerCell = col + "1";
+
+            const dataCell = col + "2";
+
+            ws[headerCell] = { t: 's', v: dataArray[i] };
+
+            ws[dataCell] = { t: 's', v: dataArray[i+1] };
+
+        }
+
+        const wbout = XLSX.write(workbook, { bookType: 'xlsx', bookSST: true, type: 'binary' });
+
+        const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
+
+        const link = document.getElementById('downloadLinkExcel');
+
+        link.href = URL.createObjectURL(blob);
+
+        link.download = 'updated_excel.xlsx';
+
+        link.style.display = 'block';
+
+    };
+
+    excelReader.readAsBinaryString(excelFile);
+
+}
+
+// Helper function to convert string to ArrayBuffer
+
+function s2ab(s) {
+
+    const buf = new ArrayBuffer(s.length);
+
+    const view = new Uint8Array(buf);
+
+    for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+
+    return buf;
+
 }
