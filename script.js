@@ -29,21 +29,31 @@ function generateQRCode() {
        downloadLink.style.display = 'block';
    }, 100);
 }
-function appendDataToExcel() {
-   const qrFile = document.getElementById('qrInput').files[0];
-   const excelFile = document.getElementById('excelInput').files[0];
-   const qrReader = new FileReader();
-   const excelReader = new FileReader();
-   let qrData;
-   qrReader.onload = async (e) => {
-       qrData = e.target.result;
-       excelReader.readAsBinaryString(excelFile);
+function decodeAndShowQRData() {
+   const fileInput= document.getElementById('qrInput');
+   const reader = new FileReader();
+   reader.onload = function() {
+       const qr = new QRCode();
+       qr.decode(reader.result);
+       qr.callback = function(err, result) {
+           if(err) {
+               alert("Error decoding QR Code.");
+           } else {
+               document.getElementById('decodedQRData').innerText = "Decoded QR Data: " + result.data;
+           }
+       };
    };
+   reader.readAsDataURL(fileInput.files[0]);
+}
+function appendDataToExcel() {
+   const decodedData = document.getElementById('decodedQRData').innerText.replace("Decoded QR Data: ", "");
+   const excelFile = document.getElementById('excelInput').files[0];
+   const excelReader = new FileReader();
    excelReader.onload = (e) => {
        const workbook = XLSX.read(e.target.result, { type: 'binary' });
        const ws = workbook.Sheets[workbook.SheetNames[0]];
        const csvData = XLSX.utils.sheet_to_csv(ws);
-       const combinedData = csvData + '\n' + qrData;
+       const combinedData = csvData + '\n' + decodedData;
        const newWs = XLSX.utils.csv_to_sheet(combinedData);
        workbook.Sheets[workbook.SheetNames[0]] = newWs;
        const updatedExcel = XLSX.write(workbook, { bookType: 'xlsx', bookSST: true, type: 'binary' });
@@ -53,5 +63,5 @@ function appendDataToExcel() {
        link.download = 'updated_excel.xlsx';
        link.style.display = 'block';
    };
-   qrReader.readAsDataURL(qrFile);
+   excelReader.readAsBinaryString(excelFile);
 }
