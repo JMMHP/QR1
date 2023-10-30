@@ -34,59 +34,64 @@ function decodeAndShowQRData() {
    const reader = new FileReader();
    reader.onload = function() {
        const qr = new QRCode();
+       qr.decode(reader.result);
        qr.callback = function(err, result) {
            if (err) {
-               alert("Error decoding QR Code: " + err);
+               alert("Error decoding QR Code.");
            } else {
-               if (result.data) {
-                   document.getElementById('decodedQRData').innerText = "Decoded QR Data: " + result.data;
-                   console.log("Decoded QR Data:", result.data);
-               } else {
-                   alert("No label data found in the QR Code.");
-               }
+               document.getElementById('decodedQRData').innerText = "Decoded QR Data: " + result.data;
            }
        };
-       qr.decode(reader.result);
    };
    reader.readAsDataURL(fileInput.files[0]);
 }
+// Adjusted function here
 function appendDataToExcel() {
    const decodedData = document.getElementById('decodedQRData').innerText.replace("Decoded QR Data: ", "");
    const excelFile = document.getElementById('excelInput').files[0];
    const excelReader = new FileReader();
    excelReader.onload = (e) => {
-       const originalWorkbook = XLSX.read(e.target.result, { type: 'binary' });
-       const wsName = originalWorkbook.SheetNames[0];
-       const originalWs = originalWorkbook.Sheets[wsName];
-       // Convert original sheet to JSON
-       const jsonData = XLSX.utils.sheet_to_json(originalWs, { header: 1 });
-       console.log("Original Excel Data:", jsonData);
-       // Assuming the decoded data is comma-separated as "header,data,header,data,..."
-       const dataArray = decodedData.split(',');
-       console.log("QR Code Data:", dataArray);
-       const newDataRow = [];
-       for (let i = 0; i < dataArray.length; i += 2) {
-           newDataRow.push(dataArray[i + 1]); // push the data only
+       const workbook = XLSX.read(e.target.result, { type: 'binary' });
+       const ws = workbook.Sheets[workbook.SheetNames[0]];
+       const qrDataParts = decodedData.split(',');
+       let newRow = {};
+       for(let i = 0; i < qrDataParts.length; i += 2) {
+           if(qrDataParts[i] && qrDataParts[i+1]) {
+               newRow[qrDataParts[i].trim()] = qrDataParts[i+1].trim();
+           }
        }
-       console.log("New Data Row:", newDataRow);
-       jsonData.push(newDataRow);
-       // Create a new workbook and add the updated sheet
-       const newWorkbook = XLSX.utils.book_new();
-       const newWs = XLSX.utils.aoa_to_sheet(jsonData);
-       XLSX.utils.book_append_sheet(newWorkbook, newWs, wsName);
-       const wbout = XLSX.write(newWorkbook, { bookType: 'xlsx', bookSST: true, type: 'binary' });
-       const blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
+       XLSX.utils.sheet_add_json(ws, [newRow], {skipHeader: true, origin: -1});
+       const updatedExcel = XLSX.write(workbook, { bookType: 'xlsx', bookSST: true, type: 'binary' });
+       const blob = new Blob([updatedExcel], { type: 'application/octet-stream' });
        const link = document.getElementById('downloadLinkExcel');
        link.href = URL.createObjectURL(blob);
        link.download = 'updated_excel.xlsx';
        link.style.display = 'block';
    };
    excelReader.readAsBinaryString(excelFile);
-}
-// Helper function to convert string to ArrayBuffer
-function s2ab(s) {
-   const buf = new ArrayBuffer(s.length);
-   const view = new Uint8Array(buf);
-   for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
-   return buf;
+}function appendDataToExcel() {
+   const decodedData = document.getElementById('decodedQRData').innerText.replace("Decoded QR Data: ", "");
+   const excelFile = document.getElementById('excelInput').files[0];
+   const excelReader = new FileReader();
+   excelReader.onload = (e) => {
+       const workbook = XLSX.read(e.target.result, { type: 'binary' });
+       const ws = workbook.Sheets[workbook.SheetNames[0]];
+       // Split the decodedData to capture headers and values
+       const qrDataParts = decodedData.split(',');
+       let newRow = {};
+       for(let i = 0; i < qrDataParts.length; i += 2) {
+           if(qrDataParts[i] && qrDataParts[i+1]) {
+               newRow[qrDataParts[i].trim()] = qrDataParts[i+1].trim();
+           }
+       }
+       // Add the new row to the worksheet
+       XLSX.utils.sheet_add_json(ws, [newRow], {skipHeader: true, origin: -1});
+       const updatedExcel = XLSX.write(workbook, { bookType: 'xlsx', bookSST: true, type: 'binary' });
+       const blob = new Blob([updatedExcel], { type: 'application/octet-stream' });
+       const link = document.getElementById('downloadLinkExcel');
+       link.href = URL.createObjectURL(blob);
+       link.download = 'updated_excel.xlsx';
+       link.style.display = 'block';
+   };
+   excelReader.readAsBinaryString(excelFile);
 }
