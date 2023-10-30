@@ -1,3 +1,5 @@
+const QRCode = require('qrcode');
+const XLSX = require('xlsx');
 function addField() {
    let container = document.getElementById('inputFields');
    let newField = document.createElement('div');
@@ -29,19 +31,15 @@ function generateQRCode() {
        downloadLink.style.display = 'block';
    }, 100);
 }
-async function appendDataToExcel() {
+function appendDataToExcel() {
    const qrFile = document.getElementById('qrInput').files[0];
    const excelFile = document.getElementById('excelInput').files[0];
    const qrReader = new FileReader();
    const excelReader = new FileReader();
    let qrData;
    qrReader.onload = async (e) => {
-       try {
-           qrData = await QRCode.decode(e.target.result);
-           excelReader.readAsBinaryString(excelFile);
-       } catch (error) {
-           console.error("Failed to decode QR:", error);
-       }
+       qrData = e.target.result;  // update this if you use a decoding library for QR
+       excelReader.readAsBinaryString(excelFile);
    };
    excelReader.onload = (e) => {
        const workbook = XLSX.read(e.target.result, { type: 'binary' });
@@ -52,11 +50,10 @@ async function appendDataToExcel() {
        workbook.Sheets[workbook.SheetNames[0]] = newWs;
        const updatedExcel = XLSX.write(workbook, { bookType: 'xlsx', bookSST: true, type: 'binary' });
        const blob = new Blob([updatedExcel], { type: 'application/octet-stream' });
-       const link = document.getElementById('downloadExcelLink');
+       const link = document.getElementById('downloadLinkExcel');
        link.href = URL.createObjectURL(blob);
        link.download = 'updated_excel.xlsx';
        link.style.display = 'block';
    };
    qrReader.readAsDataURL(qrFile);
 }
-// Place this code at the bottom of your HTML or in an external JavaScript file.
