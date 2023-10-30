@@ -3,36 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QR to Excel</title>
-</head>
-<body>
-<h1>QR to Excel Converter</h1>
-<!-- Generate QR Code Section -->
-<section>
-<h2>Generate QR Code</h2>
-<textarea id="qrContent" placeholder="Enter content for QR code..."></textarea><br>
-<button id="generateQRBtn">Generate QR Code</button><br>
-<canvas id="qrCanvas"></canvas><br>
-<a href="#" id="downloadQRLink" style="display:none;">Download QR</a>
-</section>
-<!-- Read QR Code and Append to Excel Section -->
-<section>
-<h2>Append QR Data to Excel</h2>
-<!-- Input for uploading QR Code -->
-<label>Upload QR Code:</label>
-<input type="file" id="qrInput" accept=".png, .jpg, .jpeg"><br>
-<!-- Input for uploading Excel file -->
-<label>Upload Excel File:</label>
-<input type="file" id="excelInput" accept=".xls,.xlsx"><br>
-<!-- Button to process the uploads and append data -->
-<button id="appendDataBtn">Append Data to Excel</button><br>
-<!-- Link to download updated Excel file (will be populated later) -->
-<a href="#" id="downloadLink" style="display:none;">Download Updated Excel</a>
-</section>
-<!-- External libraries and our script -->
+<title>Custom QR Code Generator & Appender</title>
+<script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.3.0/papaparse.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
-<script src="script.js"></script>
+<style>
+       .field-container {
+           margin-bottom: 10px;
+       }
+</style>
+</head>
+<body>
+<div id="inputFields">
+<div class="field-container">
+<input type="text" placeholder="Field Name" class="field-name">
+<input type="text" placeholder="Field Value" class="field-value">
+</div>
+</div>
+<button onclick="addField()">Add Another Field</button>
+<button onclick="generateQRCode()">Generate QR Code</button>
+<div id="qrcode"></div>
+<a id="downloadLink" href="#" download="qrcode.png" style="display:none;">Download QR Code</a>
+<!-- Upload and append data to Excel -->
+<h2>Append QR Data to Excel</h2>
+<label>Upload QR Code:</label>
+<input type="file" id="qrInput" accept=".png, .jpg, .jpeg"><br>
+<label>Upload Excel File:</label>
+<input type="file" id="excelInput" accept=".xls,.xlsx"><br>
+<button onclick="appendDataToExcel()">Append Data to Excel</button><br>
+<a href="#" id="downloadExcelLink" style="display:none;">Download Updated Excel</a>
+<!-- Your JS will be placed here, which I will provide in the next segment -->
 </body>
 </html>
