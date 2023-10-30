@@ -3,20 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QR Code Generator & Reader</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script type="text/javascript" src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+<title>QR to Excel</title>
 </head>
 <body>
-<h2>QR Code Generator</h2>
-<textarea id="qr-input" placeholder="Enter data for QR code"></textarea>
-<button onclick="generateQR()">Generate QR Code</button>
-<div id="qr-output"></div>
-<a href="#" id="download-link" target="_blank" download="qrcode.png" style="display:none;">Download QR Code</a>
-<h2>Upload and Convert QR to Excel</h2>
-<input type="file" id="upload" accept=".png, .jpg, .jpeg">
-<button onclick="convertToExcel()">Convert to Excel</button>
-<a href="#" id="excel-download-link" download="data.xlsx" style="display:none;">Download Excel</a>
+<h1>QR to Excel Converter</h1>
+<!-- Generate QR Code Section -->
+<section>
+<h2>Generate QR Code</h2>
+<textarea id="qrContent" placeholder="Enter content for QR code..."></textarea><br>
+<button id="generateQRBtn">Generate QR Code</button><br>
+<canvas id="qrCanvas"></canvas><br>
+<a href="#" id="downloadQRLink" style="display:none;">Download QR</a>
+</section>
+<!-- Read QR Code and Append to Excel Section -->
+<section>
+<h2>Append QR Data to Excel</h2>
+<!-- Input for uploading QR Code -->
+<label>Upload QR Code:</label>
+<input type="file" id="qrInput" accept=".png, .jpg, .jpeg"><br>
+<!-- Input for uploading Excel file -->
+<label>Upload Excel File:</label>
+<input type="file" id="excelInput" accept=".xls,.xlsx"><br>
+<!-- Button to process the uploads and append data -->
+<button id="appendDataBtn">Append Data to Excel</button><br>
+<!-- Link to download updated Excel file (will be populated later) -->
+<a href="#" id="downloadLink" style="display:none;">Download Updated Excel</a>
+</section>
+<!-- External libraries and our script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.3.0/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
