@@ -35,11 +35,12 @@ function decodeAndShowQRData() {
    reader.onload = function() {
        const qr = new QRCode();
        qr.callback = function(err, result) {
-           if(err) {
+           if (err) {
                alert("Error decoding QR Code: " + err);
            } else {
-               if(result.data) {
+               if (result.data) {
                    document.getElementById('decodedQRData').innerText = "Decoded QR Data: " + result.data;
+                   console.log("Decoded QR Data:", result.data);
                } else {
                    alert("No label data found in the QR Code.");
                }
@@ -49,7 +50,6 @@ function decodeAndShowQRData() {
    };
    reader.readAsDataURL(fileInput.files[0]);
 }
-[3:08 PM] Jordan Moeller
 function appendDataToExcel() {
    const decodedData = document.getElementById('decodedQRData').innerText.replace("Decoded QR Data: ", "");
    const excelFile = document.getElementById('excelInput').files[0];
@@ -60,12 +60,15 @@ function appendDataToExcel() {
        const originalWs = originalWorkbook.Sheets[wsName];
        // Convert original sheet to JSON
        const jsonData = XLSX.utils.sheet_to_json(originalWs, { header: 1 });
+       console.log("Original Excel Data:", jsonData);
        // Assuming the decoded data is comma-separated as "header,data,header,data,..."
        const dataArray = decodedData.split(',');
+       console.log("QR Code Data:", dataArray);
        const newDataRow = [];
-       for(let i = 0; i < dataArray.length; i+=2) {
-           newDataRow.push(dataArray[i+1]); // push the data only
+       for (let i = 0; i < dataArray.length; i += 2) {
+           newDataRow.push(dataArray[i + 1]); // push the data only
        }
+       console.log("New Data Row:", newDataRow);
        jsonData.push(newDataRow);
        // Create a new workbook and add the updated sheet
        const newWorkbook = XLSX.utils.book_new();
