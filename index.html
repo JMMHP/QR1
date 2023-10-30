@@ -1,43 +1,25 @@
-function generateQRCode() {
-   const qrContent = document.getElementById('qrContent').value;
-   const qrCanvas = document.getElementById('qrCanvas');
-   const qr = qrcode(0, 'L');
-   qr.addData(qrContent);
-   qr.make();
-   qrCanvas.innerHTML = qr.createImgTag(4);
-}
-function decodeImage() {
-   const qrUpload = document.getElementById('qrUpload').files[0];
-   const qrCanvas = document.getElementById('qrCanvas');
-   const ctx = qrCanvas.getContext('2d');
-   const img = new Image();
-   img.src = URL.createObjectURL(qrUpload);
-   img.onload = function() {
-       qrCanvas.width = img.width;
-       qrCanvas.height = img.height;
-       ctx.drawImage(img, 0, 0);
-       const imageData = ctx.getImageData(0, 0, qrCanvas.width, qrCanvas.height);
-       const decodedData = jsQR(imageData.data, imageData.width, imageData.height);
-       if (decodedData) {
-           document.getElementById('decodedData').innerText = decodedData.data;
-       } else {
-           alert("Couldn't decode QR code.");
-       }
-   }
-}
-function saveToExcelClientSide(data) {
-   const wb = XLSX.utils.book_new();
-   const ws = XLSX.utils.json_to_sheet([data]);
-   XLSX.utils.book_append_sheet(wb, ws, "Data");
-   XLSX.write(wb, { bookType: 'xlsx', type: 'blob' }).then(function(blob) {
-       const url = window.URL.createObjectURL(blob);
-       const a = document.createElement('a');
-       a.href = url;
-       a.download = 'data.xlsx';
-       a.click();
-   });
-}
-function exportToExcel() {
-   const data = document.getElementById('decodedData').innerText;
-   saveToExcelClientSide({data: data});
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR Code Generator & Reader</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.3.5/jsQR.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+</head>
+<body>
+<h2>Generate QR Code</h2>
+<textarea id="qrContent" placeholder="Enter your data..."></textarea>
+<button onclick="generateQRCode()">Generate QR Code</button>
+<h2>Your QR Code:</h2>
+<canvas id="qrCanvas"></canvas>
+<h2>Decode QR Code</h2>
+<input type="file" id="qrUpload" onchange="decodeImage()">
+<h3>Decoded Data:</h3>
+<p id="decodedData"></p>
+<button onclick="exportToExcel()">Export to Excel</button>
+<script src="script.js"></script>
+</body>
+</html>
