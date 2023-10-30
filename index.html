@@ -4,22 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QR Code Generator & Reader</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.3.5/jsQR.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
 </head>
 <body>
-<h2>Generate QR Code</h2>
-<textarea id="qrContent" placeholder="Enter your data..."></textarea>
-<button onclick="generateQRCode()">Generate QR Code</button>
-<h2>Your QR Code:</h2>
-<canvas id="qrCanvas"></canvas>
-<h2>Decode QR Code</h2>
-<input type="file" id="qrUpload" onchange="decodeImage()">
-<h3>Decoded Data:</h3>
-<p id="decodedData"></p>
-<button onclick="exportToExcel()">Export to Excel</button>
+<!-- QR Code Generator Section -->
+<h2>Generate QR Code:</h2>
+<textarea id="qr-input" placeholder="Enter data for QR code..."></textarea>
+<button onclick="generateQR()">Generate QR Code</button>
+<br>
+<img id="qr-output" src="" style="display:none; margin-top: 20px;"/>
+<a id="download-link" download="qrcode.png" style="display:none; margin-top: 20px;">Download QR Code</a>
+<!-- QR Code Reader Section -->
+<h2>Upload and Read QR Code:</h2>
+<input type="file" id="qr-upload" accept="image/*">
+<button onclick="readQR()">Convert to Excel</button>
+<p id="qr-result"></p>
 <script src="script.js"></script>
 </body>
 </html>
