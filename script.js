@@ -1,5 +1,3 @@
-const QRCode = require('qrcode');
-const XLSX = require('xlsx');
 function addField() {
    let container = document.getElementById('inputFields');
    let newField = document.createElement('div');
@@ -38,7 +36,7 @@ function appendDataToExcel() {
    const excelReader = new FileReader();
    let qrData;
    qrReader.onload = async (e) => {
-       qrData = e.target.result;  // update this if you use a decoding library for QR
+       qrData = e.target.result;
        excelReader.readAsBinaryString(excelFile);
    };
    excelReader.onload = (e) => {
