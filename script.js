@@ -1,7 +1,3 @@
-// Import necessary libraries
-const QRCode = require('qrcode');
-const { decode } = require('qrcode/decoder');
-const XLSX = require('xlsx');
 // Generate QR code based on user input
 document.getElementById('generateQRBtn').addEventListener('click', async () => {
    const content = document.getElementById('qrContent').value;
@@ -17,7 +13,7 @@ document.getElementById('qrInput').addEventListener('change', async (event) => {
    const file = event.target.files[0];
    const reader = new FileReader();
    reader.onload = async (e) => {
-       const decoded = await decode(e.target.result);
+       const decoded = await QRCode.toDataURL(e.target.result);
        console.log('Decoded QR:', decoded);
        // Note: You can store this decoded data or display it on the page.
    };
@@ -31,7 +27,7 @@ document.getElementById('appendDataBtn').addEventListener('click', () => {
    const excelReader = new FileReader();
    let qrData;
    qrReader.onload = async (e) => {
-       qrData = await decode(e.target.result);
+       qrData = await QRCode.toDataURL(e.target.result);
        excelReader.readAsBinaryString(excelFile);
    };
    excelReader.onload = (e) => {
