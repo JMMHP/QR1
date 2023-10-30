@@ -30,13 +30,13 @@ function generateQRCode() {
    }, 100);
 }
 function decodeAndShowQRData() {
-   const fileInput= document.getElementById('qrInput');
+   const fileInput = document.getElementById('qrInput');
    const reader = new FileReader();
    reader.onload = function() {
        const qr = new QRCode();
        qr.decode(reader.result);
        qr.callback = function(err, result) {
-           if(err) {
+           if (err) {
                alert("Error decoding QR Code.");
            } else {
                document.getElementById('decodedQRData').innerText = "Decoded QR Data: " + result.data;
@@ -45,6 +45,7 @@ function decodeAndShowQRData() {
    };
    reader.readAsDataURL(fileInput.files[0]);
 }
+// Adjusted function here
 function appendDataToExcel() {
    const decodedData = document.getElementById('decodedQRData').innerText.replace("Decoded QR Data: ", "");
    const excelFile = document.getElementById('excelInput').files[0];
@@ -52,10 +53,39 @@ function appendDataToExcel() {
    excelReader.onload = (e) => {
        const workbook = XLSX.read(e.target.result, { type: 'binary' });
        const ws = workbook.Sheets[workbook.SheetNames[0]];
-       const csvData = XLSX.utils.sheet_to_csv(ws);
-       const combinedData = csvData + '\n' + decodedData;
-       const newWs = XLSX.utils.csv_to_sheet(combinedData);
-       workbook.Sheets[workbook.SheetNames[0]] = newWs;
+       const qrDataParts = decodedData.split(',');
+       let newRow = {};
+       for(let i = 0; i < qrDataParts.length; i += 2) {
+           if(qrDataParts[i] && qrDataParts[i+1]) {
+               newRow[qrDataParts[i].trim()] = qrDataParts[i+1].trim();
+           }
+       }
+       XLSX.utils.sheet_add_json(ws, [newRow], {skipHeader: true, origin: -1});
+       const updatedExcel = XLSX.write(workbook, { bookType: 'xlsx', bookSST: true, type: 'binary' });
+       const blob = new Blob([updatedExcel], { type: 'application/octet-stream' });
+       const link = document.getElementById('downloadLinkExcel');
+       link.href = URL.createObjectURL(blob);
+       link.download = 'updated_excel.xlsx';
+       link.style.display = 'block';
+   };
+   excelReader.readAsBinaryString(excelFile);
+}function appendDataToExcel() {
+   const decodedData = document.getElementById('decodedQRData').innerText.replace("Decoded QR Data: ", "");
+   const excelFile = document.getElementById('excelInput').files[0];
+   const excelReader = new FileReader();
+   excelReader.onload = (e) => {
+       const workbook = XLSX.read(e.target.result, { type: 'binary' });
+       const ws = workbook.Sheets[workbook.SheetNames[0]];
+       // Split the decodedData to capture headers and values
+       const qrDataParts = decodedData.split(',');
+       let newRow = {};
+       for(let i = 0; i < qrDataParts.length; i += 2) {
+           if(qrDataParts[i] && qrDataParts[i+1]) {
+               newRow[qrDataParts[i].trim()] = qrDataParts[i+1].trim();
+           }
+       }
+       // Add the new row to the worksheet
+       XLSX.utils.sheet_add_json(ws, [newRow], {skipHeader: true, origin: -1});
        const updatedExcel = XLSX.write(workbook, { bookType: 'xlsx', bookSST: true, type: 'binary' });
        const blob = new Blob([updatedExcel], { type: 'application/octet-stream' });
        const link = document.getElementById('downloadLinkExcel');
